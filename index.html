@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau de Bord - Boutique Demo</title>
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Case cachée : ouvre le menu mobile, sans JavaScript -->
+  <input type="checkbox" id="menu-toggle" class="menu-toggle">
+  <label for="menu-toggle" class="overlay"></label>
+
+  <div class="layout">
+
+    <!-- ========== BARRE LATÉRALE ========== -->
+    <aside class="sidebar">
+      <label for="menu-toggle" class="close" title="Fermer le menu">✕</label>
+      <a class="brand" href="#indicateurs">
+        <img src="images/logo.svg" alt="" width="32" height="32">
+        <span>Boutique Demo</span>
+      </a>
+
+      <nav aria-label="Menu principal">
+        <ul class="menu">
+          <li><a href="#indicateurs"><span class="icon">▦</span><span class="label">Indicateurs</span></a></li>
+          <li><a href="#ventes"><span class="icon">▤</span><span class="label">Ventes</span></a></li>
+          <li><a href="#categories"><span class="icon">◔</span><span class="label">Catégories</span></a></li>
+          <li><a href="#commandes"><span class="icon">☰</span><span class="label">Commandes</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ========== ZONE PRINCIPALE ========== -->
+    <div class="content">
+
+      <header class="topbar">
+        <label for="menu-toggle" class="burger" title="Ouvrir le menu">☰</label>
+        <div>
+          <h1>Tableau de Bord</h1>
+          <p class="subtitle">Boutique Demo</p>
+        </div>
+        <!-- Actualisation automatique (js/refresh.js) -->
+        <div class="live">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="live-text">Mis à jour à <span id="last-update">--:--:--</span></span>
+          <button type="button" class="btn btn-light" id="pause" aria-pressed="false">⏸ Pause</button>
+        </div>
+        <div class="user">
+          <span class="avatar">AD</span>
+          <span class="user-name">Admin</span>
+        </div>
+      </header>
+
+      <main>
+
+        <!-- Message d'erreur, caché par défaut -->
+        <p class="load-error" id="load-error" hidden>Les données n'ont pas pu être chargées. Ouvrez la page avec un serveur local (par exemple Live Server).</p>
+
+        <!-- Indicateurs, mis à jour par js/stats.js -->
+        <section class="stats" id="indicateurs" aria-label="Statistiques clés">
+          <article class="card stat" data-kpi="revenue">
+            <h2>Chiffre d'affaires</h2>
+            <p class="value">158 630 DT</p>
+            <p class="trend up">▲ 9,1 % vs 2025</p>
+          </article>
+          <article class="card stat" data-kpi="orders">
+            <h2>Commandes</h2>
+            <p class="value">4 936</p>
+            <p class="trend up">▲ 4,0 % vs 2025</p>
+          </article>
+          <article class="card stat" data-kpi="customers">
+            <h2>Nouvelles clientes</h2>
+            <p class="value">1 630</p>
+            <p class="trend up">▲ 4,0 % vs 2025</p>
+          </article>
+          <article class="card stat" data-kpi="conversion">
+            <h2>Taux de conversion</h2>
+            <p class="value">3,9 %</p>
+            <p class="trend up">▲ 0,3 pt vs 2025</p>
+          </article>
+        </section>
+
+        <!-- Graphiques dessinés par Chart.js (js/charts.js) -->
+        <div class="charts">
+
+          <article class="card" id="ventes">
+            <h2>Ventes mensuelles 2026 (milliers de DT)</h2>
+            <div class="chart-box">
+              <canvas id="sales-chart" role="img" aria-label="Histogramme des ventes de janvier à octobre 2026"></canvas>
+            </div>
+          </article>
+
+          <article class="card" id="categories">
+            <h2>Ventes par catégorie</h2>
+            <div class="donut-wrap">
+              <div class="chart-box donut-box">
+                <canvas id="category-chart" role="img" aria-label="Diagramme circulaire des ventes par catégorie"></canvas>
+                <span class="donut-label">Ventes</span>
+              </div>
+              <ul class="legend" id="category-legend"></ul> <!-- remplie par js/charts.js -->
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Tableau des commandes : lignes générées par js/table.js -->
+        <article class="card" id="commandes">
+          <div class="card-head">
+            <h2>Commandes</h2>
+            <button type="button" class="btn" id="export-csv">⭳ Exporter en CSV</button>
+          </div>
+
+          <!-- Filtres : leurs valeurs sont mémorisées dans localStorage -->
+          <div class="filters">
+            <label>Rechercher
+              <input type="search" id="search" placeholder="N°, cliente, produit…">
+            </label>
+            <label>Statut
+              <select id="status-filter">
+                <option value="all">Tous</option>
+                <option value="delivered">Livrée</option>
+                <option value="pending">En cours</option>
+                <option value="cancelled">Annulée</option>
+              </select>
+            </label>
+            <label>Catégorie
+              <select id="category-filter">
+                <option value="all">Toutes</option>
+              </select>
+            </label>
+            <label>Mois
+              <select id="month-filter">
+                <option value="all">Tous</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-light" id="reset-filters">Réinitialiser</button>
+          </div>
+          <p class="row-count" id="row-count"></p>
+
+          <div class="table-wrap">
+            <table>
+              <!-- data-key : colonne utilisée pour le tri -->
+              <thead>
+                <tr>
+                  <th scope="col" data-key="id"><button type="button">N°</button></th>
+                  <th scope="col" data-key="date"><button type="button">Date</button></th>
+                  <th scope="col" data-key="customer"><button type="button">Cliente</button></th>
+                  <th scope="col" data-key="product"><button type="button">Produit</button></th>
+                  <th scope="col" data-key="amount"><button type="button">Montant</button></th>
+                  <th scope="col" data-key="status"><button type="button">Statut</button></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+      </main>
+
+      <footer>
+        <p>© 2026 Boutique Demo - Mini-projet HTML5 / CSS3 / JavaScript - Données fictives - Graphiques : Chart.js</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Chart.js depuis un CDN, puis notre code sous forme de module -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

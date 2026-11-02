@@ -1,0 +1,193 @@
+{
+  "year": 2026,
+  "kpis": {
+    "orders": 4936,
+    "customers": 1630,
+    "conversion": 3.9
+  },
+  "reference2025": {
+    "revenue": 145399,
+    "orders": 4746,
+    "customers": 1567,
+    "conversion": 3.6
+  },
+  "months": [
+    {
+      "name": "Janvier",
+      "short": "Janv",
+      "sales": 12480
+    },
+    {
+      "name": "Février",
+      "short": "Févr",
+      "sales": 11800
+    },
+    {
+      "name": "Mars",
+      "short": "Mars",
+      "sales": 14200
+    },
+    {
+      "name": "Avril",
+      "short": "Avr",
+      "sales": 15100
+    },
+    {
+      "name": "Mai",
+      "short": "Mai",
+      "sales": 15900
+    },
+    {
+      "name": "Juin",
+      "short": "Juin",
+      "sales": 17200
+    },
+    {
+      "name": "Juillet",
+      "short": "Juil",
+      "sales": 16000
+    },
+    {
+      "name": "Août",
+      "short": "Août",
+      "sales": 18400
+    },
+    {
+      "name": "Septembre",
+      "short": "Sept",
+      "sales": 19100
+    },
+    {
+      "name": "Octobre",
+      "short": "Oct",
+      "sales": 18450
+    }
+  ],
+  "categories": [
+    {
+      "name": "Robes",
+      "sales": 63452
+    },
+    {
+      "name": "Hauts et t-shirts",
+      "sales": 44416
+    },
+    {
+      "name": "Jupes et pantalons",
+      "sales": 31726
+    },
+    {
+      "name": "Accessoires",
+      "sales": 19036
+    }
+  ],
+  "catalog": [
+    {
+      "product": "Robe fleurie",
+      "category": "Robes",
+      "price": 95
+    },
+    {
+      "product": "Robe longue d'été",
+      "category": "Robes",
+      "price": 110
+    },
+    {
+      "product": "Robe de soirée",
+      "category": "Robes",
+      "price": 160
+    },
+    {
+      "product": "T-shirt basique",
+      "category": "Hauts et t-shirts",
+      "price": 29
+    },
+    {
+      "product": "Blouse brodée",
+      "category": "Hauts et t-shirts",
+      "price": 79
+    },
+    {
+      "product": "Chemise en lin",
+      "category": "Hauts et t-shirts",
+      "price": 69
+    },
+    {
+      "product": "Jupe plissée",
+      "category": "Jupes et pantalons",
+      "price": 65
+    },
+    {
+      "product": "Jean taille haute",
+      "category": "Jupes et pantalons",
+      "price": 120
+    },
+    {
+      "product": "Pantalon large",
+      "category": "Jupes et pantalons",
+      "price": 89
+    },
+    {
+      "product": "Sac bandoulière",
+      "category": "Accessoires",
+      "price": 55
+    },
+    {
+      "product": "Foulard en soie",
+      "category": "Accessoires",
+      "price": 35
+    },
+    {
+      "product": "Ceinture tressée",
+      "category": "Accessoires",
+      "price": 25
+    }
+  ],
+  "customers": [
+    "Asma Mabrouk",
+    "Amira Baccouche",
+    "Khawla Abidi",
+    "Emna Laabidi",
+    "Sarra Guesmi",
+    "Yasmine Sghaier",
+    "Nour Trabelsi",
+    "Rania Kammoun",
+    "Ines Masmoudi",
+    "Mariem Belhaj",
+    "Salma Mejri",
+    "Fatma Khelifi",
+    "Hiba Jlassi",
+    "Oumaima Ben Ali",
+    "Eya Hamdi",
+    "Rim Karray",
+    "Wiem Jebali",
+    "Chaima Zouari",
+    "Malek Hajji",
+    "Nesrine Ayari",
+    "Siwar Ferchichi",
+    "Aya Ben Salah",
+    "Ghada Chebbi",
+    "Rahma Fourati",
+    "Dorra Ouertani",
+    "Lina Bouazizi",
+    "Mouna Chaabane",
+    "Olfa Gharbi",
+    "Hela Saidi",
+    "Imen Dridi",
+    "Sonia Zitouni",
+    "Takwa Tlili",
+    "Yosra Riahi",
+    "Zeineb Ellouze",
+    "Farah Sassi",
+    "Molka Mansour",
+    "Arij Nasri",
+    "Sirine Bouslama",
+    "Nada Rekik",
+    "Ons Hammami",
+    "Khawla Trabelsi",
+    "Emna Chaabane",
+    "Khawla Gharbi",
+    "Amira Belhaj",
+    "Asma Dridi"
+  ]
+}

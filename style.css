@@ -1,0 +1,736 @@
+/* ==========================================================
+   Tableau de bord interactif - Boutique Demo
+   Sommaire : 1. Variables  2. Base  3. Mise en page (Grid)
+              4. Barre latérale  5. En-tête  6. Cartes
+              7. Graphiques  8. Tableau  9. Interactivité
+              10. Responsive
+   ========================================================== */
+
+/* 1. Variables ------------------------------------------- */
+/* Couleurs et dimensions réutilisées partout avec var(--nom) */
+:root {
+  --pink: #f1bfd0;
+  --pink-soft: #fdf0f4;
+  --periwinkle: #b9c0ea;
+  --periwinkle-soft: #eef0fb;
+  --sage: #b9d0b5;
+  --sage-soft: #eef5ec;
+
+  --primary: var(--periwinkle);
+  --primary-light: #f9f8fd;
+  --dark: #5c6094;
+  --text: #4f5170;
+  --muted: #9496b0;
+  --bg: #fcfbfe;
+  --white: #ffffff;
+  --border: #efecf6;
+  --green: #5f8f5a;
+  --red: #cc7a98;
+  --orange: #6a72b0;
+  --radius: 18px;
+  --sidebar-width: 230px;
+}
+
+/* Couleurs selon la valeur : vert = bon, pervenche = moyen, rose = faible */
+[data-tone="good"]    { --tone-a: #9cc496; --tone-m: #b3d2ae; --tone-b: #cfe4cb; }
+[data-tone="neutral"] { --tone-a: #98a2e0; --tone-m: #b0b8e8; --tone-b: #c9cef1; }
+[data-tone="bad"]     { --tone-a: #eaa3bc; --tone-m: #f0bccf; --tone-b: #f7d6e0; }
+
+/* 2. Base ------------------------------------------------ */
+/* Suppression des marges par défaut du navigateur */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* 3. Mise en page générale (Grid) ------------------------ */
+/* Grille principale : barre latérale | contenu */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr); /* 230px fixe + le reste */
+  min-height: 100vh;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+}
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  padding: 20px 24px;
+  align-content: start;
+}
+
+/* Les sections ciblées par le menu ne se collent pas au bord de l'écran */
+#indicateurs, #ventes, #categories, #commandes {
+  scroll-margin-top: 16px;
+}
+
+/* 4. Barre latérale -------------------------------------- */
+.sidebar {
+  background: #eceefa;
+  color: var(--dark);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 20px 14px;
+  position: sticky; /* reste visible quand on fait défiler la page */
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--dark);
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0 8px 20px;
+}
+
+.menu {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu a:hover {
+  background: rgba(185, 192, 234, 0.3);
+}
+
+/* Lien actif du menu, sans JavaScript */
+.layout:not(:has(:target)) .menu a[href="#indicateurs"],
+.layout:has(#indicateurs:target) .menu a[href="#indicateurs"],
+.layout:has(#ventes:target) .menu a[href="#ventes"],
+.layout:has(#categories:target) .menu a[href="#categories"],
+.layout:has(#commandes:target) .menu a[href="#commandes"] {
+  background: #d5daf5;
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.icon {
+  width: 20px;
+  text-align: center;
+}
+
+/* 5. En-tête --------------------------------------------- */
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto; /* ☰ | titre | mise à jour | utilisateur */
+  align-items: center;
+  gap: 12px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+}
+
+.topbar h1 {
+  font-size: 1.4rem;
+  color: var(--dark);
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Case cachée : ouvre le menu mobile, sans JavaScript */
+.menu-toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.burger {
+  display: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* Fond sombre et bouton ✕ du menu mobile */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
+  background: rgba(75, 79, 138, 0.25);
+}
+
+.close {
+  display: none;
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: var(--dark);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: rgba(185, 192, 234, 0.3);
+}
+
+/* 6. Cartes ---------------------------------------------- */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(150, 156, 200, 0.12);
+}
+
+.card h2 {
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 14px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cartes côte à côte */
+  gap: 20px;
+}
+
+.stat h2 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.trend {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.trend.up   { color: var(--green); }
+.trend.down { color: var(--red); }
+.trend.flat { color: var(--muted); font-weight: 400; }
+
+/* 7. Graphiques ------------------------------------------ */
+.charts {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* histogramme 2/3, anneau 1/3 */
+  gap: 20px;
+}
+
+/* Conteneur d'un graphique Chart.js : le <canvas> prend la taille de ce bloc */
+.chart-box {
+  position: relative;
+  height: 260px;
+}
+
+.donut-box {
+  width: 190px;
+  height: 190px;
+}
+
+.donut-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+}
+
+/* Texte « Ventes » au centre de l'anneau */
+.donut-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.legend {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+/* Légende : clic = masquer la part */
+.legend button {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.legend button:hover,
+.legend button:focus-visible {
+  background: var(--primary-light);
+}
+
+/* Part masquée : ligne estompée et barrée */
+.legend button[aria-pressed="false"] {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.legend b {
+  margin-left: auto;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.c1, .c3 { background: var(--tone-a); }
+.c2, .c4 { background: var(--tone-m); }
+
+/* 8. Tableau --------------------------------------------- */
+.table-wrap {
+  overflow: auto;
+  max-height: 440px; /* au-delà, le tableau défile dans sa carte */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  position: sticky; /* l'en-tête reste visible quand le tableau défile */
+  top: 0;
+  background: var(--white);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background: var(--primary-light);
+}
+
+/* Badge de statut : vert = livrée, pervenche = en cours, rose = annulée */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge.ok   { background: var(--sage-soft); color: var(--green); }
+.badge.wait { background: var(--periwinkle-soft); color: var(--orange); }
+.badge.ko   { background: var(--pink-soft); color: var(--red); }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 16px;
+}
+
+/* 9. Interactivité --------------------------------------- */
+/* Contour visible sur l'élément sélectionné au clavier (touche Tab) */
+:focus-visible {
+  outline: 2px solid var(--dark);
+  outline-offset: 2px;
+}
+
+/* Boutons (export, pause, réinitialiser) */
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 7px 14px;
+  background: var(--primary);
+  color: var(--dark);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.2s;
+}
+
+.btn:hover {
+  filter: brightness(0.95);
+}
+
+.btn-light {
+  background: var(--periwinkle-soft);
+}
+
+/* Actualisation automatique dans l'en-tête : pastille, heure et bouton Pause */
+.live {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* La pastille verte « clignote » tant que l'actualisation tourne */
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* En pause : pastille grise et immobile */
+.live:has(#pause[aria-pressed="true"]) .live-dot {
+  background: var(--muted);
+  animation: none;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.3; }
+}
+
+/* Titre de la carte et bouton d'export sur la même ligne */
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card-head h2 {
+  margin-bottom: 0;
+}
+
+/* Barre de filtres au-dessus du tableau */
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto; /* recherche plus large */
+  align-items: end;
+  gap: 12px;
+}
+
+.filters label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.filters input,
+.filters select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.row-count {
+  margin: 10px 0 4px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Titres de colonnes cliquables pour trier */
+th button {
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+/* Flèche de tri selon l'attribut aria-sort, mis à jour par js/table.js */
+th button::after {
+  content: " ↕";
+  opacity: 0.4;
+}
+
+th[aria-sort="ascending"] button::after  { content: " ▲"; opacity: 1; }
+th[aria-sort="descending"] button::after { content: " ▼"; opacity: 1; }
+
+th[aria-sort="ascending"],
+th[aria-sort="descending"] {
+  color: var(--dark);
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+}
+
+/* Nouvelle commande ajoutée par l'actualisation : fond vert qui s'efface */
+tr.new-row {
+  animation: flash 2s ease-out;
+}
+
+@keyframes flash {
+  from { background: var(--sage-soft); }
+  to   { background: transparent; }
+}
+
+/* Message affiché si les données ou Chart.js n'ont pas pu être chargés */
+.load-error {
+  background: var(--pink-soft);
+  color: var(--red);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+/* Moins d'animations si l'utilisateur le demande */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .live-dot, tr.new-row { animation: none; }
+}
+
+/* 10. Responsive ---------------------------------------- */
+/* Tablette : menu réduit aux icônes */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding: 20px 14px;
+  }
+
+  .brand span,
+  .menu .label {
+    display: none;
+  }
+
+  .brand,
+  .menu a {
+    justify-content: center;
+  }
+
+  .menu a {
+    padding: 10px 0;
+  }
+
+  .content {
+    grid-column: 2;
+  }
+
+  .burger {
+    display: block;
+  }
+
+  /* Menu ouvert par le bouton ☰ */
+  .menu-toggle:checked ~ .layout .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: var(--sidebar-width);
+    box-shadow: 0 0 30px rgba(75, 79, 138, 0.25);
+  }
+
+  .menu-toggle:checked ~ .layout .brand span,
+  .menu-toggle:checked ~ .layout .menu .label {
+    display: initial;
+  }
+
+  .menu-toggle:checked ~ .layout .brand,
+  .menu-toggle:checked ~ .layout .menu a {
+    justify-content: flex-start;
+  }
+
+  .menu-toggle:checked ~ .layout .menu a {
+    padding: 10px 12px;
+  }
+
+  .menu-toggle:checked ~ .layout .brand {
+    padding-right: 44px;
+  }
+
+  .menu-toggle:checked ~ .overlay,
+  .menu-toggle:checked ~ .layout .close {
+    display: block;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .donut-wrap {
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    align-items: center;
+  }
+}
+
+/* Mobile : barre latérale masquée, ouverte par le bouton ☰ */
+@media (max-width: 640px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .content {
+    grid-column: 1;
+  }
+
+  /* Barre latérale poussée hors de l'écran, à gauche */
+  .sidebar {
+    position: fixed;
+    z-index: 10;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform 0.25s;
+  }
+
+  .brand span,
+  .menu .label {
+    display: initial;
+  }
+
+  .brand,
+  .menu a {
+    justify-content: flex-start;
+  }
+
+  .menu a {
+    padding: 10px 12px;
+  }
+
+  /* Case cochée : la barre latérale revient à l'écran */
+  .menu-toggle:checked ~ .layout .sidebar {
+    transform: translateX(0);
+  }
+
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  main {
+    padding: 16px;
+  }
+
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .donut-wrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .chart-box {
+    height: 220px;
+  }
+
+  .donut-box {
+    height: 190px;
+  }
+
+  .live-text {
+    display: none;
+  }
+
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card-head {
+    flex-wrap: wrap;
+  }
+}
